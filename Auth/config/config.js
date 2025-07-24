@@ -27,10 +27,7 @@ export default {
   privateKey: loadKey('private.key'),
   publicKey:  loadKey('public.key'),
   db: {
-    host:     process.env.DB_HOST,
-    user:     process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
+    url: process.env.PLANETSCALE_DATABASE_URL,
   },
   googleClientId:     process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
