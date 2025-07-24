@@ -10,7 +10,7 @@
     "test": "echo \"No tests\" && exit 0"
   },
   "dependencies": {
-    "@planetscale/database": "^1.19.0",
+    "@neondatabase/serverless": "^1.0.1",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

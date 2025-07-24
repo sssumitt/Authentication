@@ -27,7 +27,7 @@ export default {
   privateKey: loadKey('private.key'),
   publicKey:  loadKey('public.key'),
   db: {
-    url: process.env.PLANETSCALE_DATABASE_URL,
+    url: process.env.DATABASE_URL,
   },
   googleClientId:     process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
