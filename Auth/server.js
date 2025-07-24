@@ -7,6 +7,7 @@ import config         from './config/config.js'
 import authRoutes     from './routes/auth.js'
 import protectedRoutes from './routes/protected.js'
 import { sql }        from './db.js'
+import csurf from 'csurf'
 
 const app = express()
 const PORT = config.port || 3000
@@ -16,6 +17,7 @@ const PORT = config.port || 3000
 // Middleware
 app.use(express.json())
 app.use(cookieParser())
+app.use(csurf({ cookie: { httpOnly: true, sameSite: 'strict' } }))
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || config.frontendUrl,
