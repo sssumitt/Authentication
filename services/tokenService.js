@@ -20,17 +20,20 @@ export function issueTokens(res, payload) {
   const accessToken  = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
 
+  // Make the access_token available on every path
   res.cookie('access_token', accessToken, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'None',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    path:     '/',               // ◀️ add this
     maxAge:   15 * 60 * 1000,
   });
 
+  // Refresh token only on the refresh route
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'None',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     path:     '/auth/refresh',
     maxAge:   7 * 24 * 60 * 60 * 1000,
   });
