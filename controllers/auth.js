@@ -154,7 +154,7 @@ export const googleCallback = async (req, res) => {
     await saveRefreshToken(refreshToken, userId);
 
     // redirect to frontend dashboard
-    const frontend = (process.env.FRONTEND_UR).replace(/\/+$/, '');
+    const frontend = (process.env.FRONTEND_URL).replace(/\/+$/, '');
     res.redirect(`${frontend}/dashboard`);
   } catch (err) {
     console.error('Google callback error:', err);
