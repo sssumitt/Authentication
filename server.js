@@ -17,13 +17,23 @@ const PORT = config.port || 3000
 // Middleware
 app.use(express.json())
 app.use(cookieParser())
-app.use(csurf({ cookie: { httpOnly: true, sameSite: 'strict' } }))
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || config.frontendUrl,
     credentials: true,
   })
 )
+
+app.use(
+  csurf({
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+      sameSite: 'None',                              // allow cross‑site
+    },
+  })
+);
 
 // Routes
 app.use('/auth', authRoutes)
@@ -35,15 +45,15 @@ const startApp = async () => {
   try {
     // A simple test query
     await sql`SELECT 1`
-    console.log('✅ Database connection OK')
+    console.log('Database connection OK')
 
     // Only start the HTTP server after the DB check passes
     app.listen(PORT, () => {
-      console.log(`🚀 Server listening on port ${PORT}`);
+      console.log(`Server listening on port ${PORT}`);
     });
 
   } catch (err) {
-    console.error('❌ Database connection failed:', err.message);
+    console.error('Database connection failed:', err.message);
     process.exit(1);  // stop the process if we can’t reach the DB
   }
 };
