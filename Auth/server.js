@@ -29,24 +29,23 @@ app.use(
 app.use('/auth', authRoutes)
 app.use('/protected', protectedRoutes)
 
-// Verify DB on cold start
-const ready = (async () => {
-  await sql`SELECT 1`
-  console.log('✅ Database connection OK')
-})().catch(err => {
-  console.error('❌ Database connection failed:', err.message)
-})
 
-// === LOCAL DEV: listen when run directly ===
-if (!process.env.VERCEL) {
-  // only call listen when not running in Vercel’s serverless environment
-  app.listen(PORT, () => {
-    console.log(`🚀 Dev server listening on http://localhost:${PORT}`)
-  })
-}
 
-// === VERCEL: export a handler for Serverless ===
-export default async function handler(req, res) {
-  await ready
-  return app(req, res)
-}
+const startApp = async () => {
+  try {
+    // A simple test query
+    await sql`SELECT 1`
+    console.log('✅ Database connection OK')
+
+    // Only start the HTTP server after the DB check passes
+    app.listen(PORT, () => {
+      console.log(`🚀 Server listening on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1);  // stop the process if we can’t reach the DB
+  }
+};
+
+startApp();
