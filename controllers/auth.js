@@ -119,49 +119,45 @@ export const googleAuth = (req, res) => {
 }
 
 /** GOOGLE OAUTH: callback */
+/** GOOGLE OAUTH: callback */
 export const googleCallback = async (req, res) => {
-  const code = req.query.code
+  const code = req.query.code;
   if (!code) {
-    return res.status(400).send('Missing code from Google')
+    return res.status(400).send('Missing code from Google');
   }
-  try {
-    const { email, sub } = await getGoogleUser(code)
 
-    // try find by google_id
-    const byGoogle = await sql`
-      SELECT id FROM users WHERE google_id = ${sub}
-    `
-    let userId
+  try {
+    const { email, sub } = await getGoogleUser(code);
+
+    // find or create user
+    const byGoogle = await sql`SELECT id FROM users WHERE google_id = ${sub}`;
+    let userId;
     if (byGoogle.length) {
-      userId = byGoogle[0].id
+      userId = byGoogle[0].id;
     } else {
-      // or link to existing by email
-      const byEmail = await sql`
-        SELECT id FROM users WHERE username = ${email}
-      `
+      const byEmail = await sql`SELECT id FROM users WHERE username = ${email}`;
       if (byEmail.length) {
-        userId = byEmail[0].id
-        await sql`
-          UPDATE users SET google_id = ${sub} WHERE id = ${userId}
-        `
+        userId = byEmail[0].id;
+        await sql`UPDATE users SET google_id = ${sub} WHERE id = ${userId}`;
       } else {
-        // new user
         const insert = await sql`
           INSERT INTO users (username, google_id)
           VALUES (${email}, ${sub})
           RETURNING id
-        `
-        userId = insert[0].id
+        `;
+        userId = insert[0].id;
       }
     }
 
-    // issue tokens
-    const { accessToken, refreshToken } = issueTokens(res, { username: email })
-    await saveRefreshToken(refreshToken, userId)
+    // issue tokens (sets cookies)
+    const { accessToken, refreshToken } = issueTokens(res, { username: email });
+    await saveRefreshToken(refreshToken, userId);
 
-    res.redirect('/dashboard')
+    // redirect to frontend dashboard
+    const frontend = (process.env.FRONTEND_UR).replace(/\/+$/, '');
+    res.redirect(`${frontend}/dashboard`);
   } catch (err) {
-    console.error('Google callback error:', err)
-    res.status(500).send('Authentication failed.')
+    console.error('Google callback error:', err);
+    res.status(500).send('Authentication failed.');
   }
-}
+};
