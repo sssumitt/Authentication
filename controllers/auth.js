@@ -159,7 +159,7 @@ export const googleCallback = async (req, res) => {
     const { accessToken, refreshToken } = issueTokens(res, { username: email })
     await saveRefreshToken(refreshToken, userId)
 
-    res.redirect('/?oauth=success')
+    res.redirect('/dashboard')
   } catch (err) {
     console.error('Google callback error:', err)
     res.status(500).send('Authentication failed.')
